@@ -21,7 +21,7 @@ async def daily_standup_report():
     "descriptions": {
       "app_name": "Daily Standup Report",
       "app_description": "This Telex integration sends a scheduled reminder to a channel, prompting team members to submit their daily (or weekly) standup reports. It helps streamline the reporting process, ensuring consistent updates and improved team communication. Users can configure the time and frequency of the reminders.",
-      "app_logo": "''",
+      "app_logo": "https://static.thenounproject.com/png/1259527-512.png",
       "app_url": "https://share-blogs-telex-api.onrender.com/",
       "background_color": "#fff"
     },
@@ -38,7 +38,7 @@ async def daily_standup_report():
         "label": "Reminder Frequency",
         "type": "text",
         "required": True,
-        "default": "40 21 * * *"
+        "default": "45 21 * * *"
       },
       {
         "label": "Reminder Message",
