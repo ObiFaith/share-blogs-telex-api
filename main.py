@@ -38,7 +38,7 @@ async def daily_standup_report():
         "label": "Reminder Frequency",
         "type": "text",
         "required": True,
-        "default": "35 21 * * *"
+        "default": "40 21 * * *"
       },
       {
         "label": "Reminder Message",
