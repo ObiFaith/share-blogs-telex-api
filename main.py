@@ -68,15 +68,16 @@ async def get_integration():
 async def daily_standup_report(request: Request):
   try:
     data = await request.json()
-    return_url = data.get("return_url")  # Telex should send this in the request
+    return_url = data.get("return_url")
     message = {
-        "content": data.get("settings", {}).get("Reminder Message", "Time for standup!")
+      "content": data.get("settings", {}).get("Reminder Message", "Time for standup!")
     }
 
     async with httpx.AsyncClient() as client:
-        response = await client.post(return_url, json=message)
+      response = await client.post(return_url, json=message)
 
-    return {"status": "Message sent", "telex_response": response.json()}
+    data = await response.json()
+    return {"status": "Message sent", "telex_response": data}
   except Exception as e:
     return JSONResponse(
       content={"error": str(e)},
