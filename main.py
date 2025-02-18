@@ -67,7 +67,7 @@ async def get_integration():
 async def daily_standup_report(request: Request):
   try:
     data = await request.json()
-    return data
+    return {"status": "Message sent", "telex_response": data}
   except Exception as e:
     return JSONResponse(
       content={"error": str(e)},
