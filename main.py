@@ -11,35 +11,53 @@ app.add_middleware(
 )
 
 @app.get('/api/v1/integration')
-def index():
+async def daily_standup_report():
   return {
-    "data": {
-      "date": {
-        "created_at": "2025-02-17",
-        "updated_at": "2025-02-17"
+  "data": {
+    "date": {
+      "created_at": "2025-02-18",
+      "updated_at": "2025-02-18"
+    },
+    "descriptions": {
+      "app_name": "Daily Standup Report",
+      "app_description": "This Telex integration sends a scheduled reminder to a channel, prompting team members to submit their daily (or weekly) standup reports. It helps streamline the reporting process, ensuring consistent updates and improved team communication. Users can configure the time and frequency of the reminders.",
+      "app_logo": "''",
+      "app_url": "https://share-blogs-telex-api.onrender.com/",
+      "background_color": "#fff"
+    },
+    "is_active": True,
+    "integration_category": "Communication & Collaboration",
+    "integration_type": "interval",
+    "key_features": [
+      "Scheduled reminders",
+      "Report template/format guidance in the reminder message."
+    ],
+    "author": "Faith Obi",
+    "settings": [
+      {
+        "label": "Reminder Frequency",
+        "type": "text",
+        "required": True,
+        "default": "35 21 * * *"
       },
-      "descriptions": {
-        "app_name": "Share Learning Blog Posts",
-        "app_description": "This API Integration that share learning blog post to team in an organization based on a specific interval daily.",
-        "app_logo": "''",
-        "app_url": "https://share-blogs-telex-api.onrender.com/",
-        "background_color": "#fff"
+      {
+        "label": "Reminder Message",
+        "type": "text",
+        "required": True,
+        "default": "Reminder: It's time for your daily standup report!  What have you accomplished since the last stand-up? [What you accomplished here]  What are you working on next? [What you will be doing]  Any blockers? [blocked?]"
       },
-      "is_active": True,
-      "integration_type": "interval",
-      "key_features": [
-        "Share Learning Blog Posts"
-      ],
-      "author": "Faith Obi",
-      "settings": [
-        {
-          "label": "Blog RSS Feed URL",
-          "type": "text",
-          "required": True,
-          "default": "true"
-        }
-      ],
-      "target_url": "''",
-      "tick_url": "https://share-blogs-telex-api.onrender.com/api/v1/integration"
-    }
+      {
+        "label": "Mention Type",
+        "type": "dropdown",
+        "required": True,
+        "default": "@channel",
+        "options": [
+          "@channel",
+          "@here"
+        ]
+      }
+    ],
+    "target_url": "''",
+    "tick_url": "https://share-blogs-telex-api.onrender.com/api/v1/integration"
+  }
 }
