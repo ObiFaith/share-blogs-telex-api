@@ -12,7 +12,7 @@ app.add_middleware(
     allow_headers=['Authorization', 'Content-Type']
 )
 
-@app.post('/daily-standup-report')
+@app.post('/tick')
 async def daily_standup_report(request: Request):
   try:
     data = await request.json()
