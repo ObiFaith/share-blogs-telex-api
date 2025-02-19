@@ -12,7 +12,7 @@ app.add_middleware(
     allow_headers=['Authorization', 'Content-Type']
 )
 
-@app.get('/api/v1')
+@app.get('integration.json')
 def get_integration():
   return {
     "data": {
