@@ -46,8 +46,8 @@ def get_integration():
           "label": "Reminder Message",
           "type": "text",
           "required": True,
-          "default": "Reminder: It's time for your daily standup report!  What have you accomplished since the last stand-up? [What you accomplished here]  What are you working on next? [What you will be doing]  Any blockers? [blocked?]"
-        },
+          "default": "Reminder: It's time for your daily standup report!\nWhat have you accomplished since the last stand-up?\n[What you accomplished here]\nWhat are you working on next?\n[What you will be doing]\nAny blockers?\n[blocked?]"
+      },
         {
           "label": "Mention Type",
           "type": "dropdown",
