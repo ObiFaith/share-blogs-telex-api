@@ -1,7 +1,8 @@
 import httpx
-from fastapi import FastAPI, Request, status
-from fastapi.responses import JSONResponse
+from typing import List
+from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi import FastAPI, Request, status, BackgroundTasks
 
 app = FastAPI()
 app.add_middleware(
@@ -12,18 +13,30 @@ app.add_middleware(
     allow_headers=['Authorization', 'Content-Type']
 )
 
-@app.get('/integration.json')
-def get_integration(request: Request):
+class Setting(BaseModel):
+  label: str
+  type: str
+  required: bool
+  default: str
+  options: List[str] = None
+
+class TickPayload(BaseModel):
+  channel_id: str
+  return_url: str
+  settings: List[Setting]
+
+@app.get("/integration.json")
+async def get_integration_json(request: Request):
   base_url = str(request.base_url).rstrip("/")
   return {
     "data": {
       "date": {
-        "created_at": "2025-02-18",
-        "updated_at": "2025-02-18"
+        "created_at": "2025-02-19",
+        "updated_at": "2025-02-19"
       },
       "descriptions": {
         "app_name": "Daily Standup Report",
-        "app_description": "This Telex integration sends a scheduled reminder to a channel, prompting team members to submit their daily (or weekly) standup reports.",
+        "app_description": "This Telex integration sends a scheduled reminder to a channel, prompting team members to submit their daily standup reports.",
         "app_logo": "https://static.thenounproject.com/png/1259527-512.png",
         "app_url": "https://share-blogs-telex-api.onrender.com/",
         "background_color": "#fff"
@@ -65,61 +78,29 @@ def get_integration(request: Request):
     }
   }
 
-@app.post('/tick')
-async def daily_standup_report(request: Request):
-  try:
-    data = await request.json()
-    return_url = data.get("return_url")
-    settings = data.get("settings")
-
-    if not return_url:
-      return JSONResponse(
-        content={"error": "Return URL not provided"},
-        status_code=status.HTTP_400_BAD_REQUEST,
-      )
-
-    if not settings or not isinstance(settings, list):
-      return JSONResponse(
-          content={"error": "Settings must be a list and cannot be empty"},
-          status_code=status.HTTP_400_BAD_REQUEST
-      )
-
-    mention_type = ""
-    reminder_message = ""
-
-    for setting in settings:
-      if setting["label"] == "Reminder Message":
-        reminder_message = setting.get("default", "Time for standup!")
-      elif setting["label"] == "Mention Type":
-        mention_type = setting.get("default", "@channel")
+async def send_standup_reminder(payload: TickPayload):
+    mention_type = next(
+      (s.default for s in payload.settings if s.label == "Mention Type"),
+      "@channel",
+    )
+    reminder_message = next(
+      (s.default for s in payload.settings if s.label == "Reminder Message"),
+      "Time for standup!",
+    )
 
     message = f"{mention_type} {reminder_message}"
 
-    payload = {
+    data = {
       "event_name": "Daily Standup Report",
       "message": message,
       "status": "success",
-      "username": "TelexBot"
+      "username": "Standup Bot",
     }
 
     async with httpx.AsyncClient() as client:
-      try:
-        response = await client.post(
-          return_url,
-          json=payload,
-          headers={"Accept": "application/json", "Content-Type": "application/json"}
-        )
+      await client.post(payload.return_url, json=data)
 
-        response.raise_for_status()
-
-        return response.json()
-      except httpx.HTTPStatusError as http_err:
-        return JSONResponse(content={"error": str(http_err)}, status_code=response.status_code)
-      except httpx.RequestError as req_err:
-        return JSONResponse(content={"error": str(req_err)}, status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-  except Exception as e:
-    return JSONResponse(
-      content={"error": str(e)},
-      status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-    )
+@app.post("/tick", status_code=status.HTTP_202_ACCEPTED)
+async def tick(payload: TickPayload, background_tasks: BackgroundTasks):
+  background_tasks.add_task(send_standup_reminder, payload)
+  return {"status": "accepted"}
