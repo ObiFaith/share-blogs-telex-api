@@ -13,7 +13,8 @@ app.add_middleware(
 )
 
 @app.get('/integration.json')
-def get_integration():
+def get_integration(request: Request):
+  base_url = str(request.base_url).rstrip("/")
   return {
     "data": {
       "date": {
@@ -40,13 +41,13 @@ def get_integration():
           "label": "interval",
           "type": "text",
           "required": True,
-          "default": "* * * * *"
+          "default": "*/5 * * * *"
         },
         {
           "label": "Reminder Message",
           "type": "text",
           "required": True,
-          "default": "Reminder: It's time for your daily standup report!\nWhat have you accomplished since the last stand-up?\n[What you accomplished here]\nWhat are you working on next?\n[What you will be doing]\nAny blockers?\n[blocked?]"
+          "default": "Reminder: DAILY STAND-UP REPORT\nWhat have you accomplished since the last stand-up?\n[What you accomplished here]\n\nWhat are you working on next?\n[What you will be doing]\n\nAny blockers?\n[blocked?]"
       },
         {
           "label": "Mention Type",
@@ -60,7 +61,7 @@ def get_integration():
         }
       ],
       "target_url": "''",
-      "tick_url": "https://share-blogs-telex-api.onrender.com/tick"
+      "tick_url": f"{base_url}/tick"
     }
   }
 
