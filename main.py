@@ -64,7 +64,7 @@ def get_integration():
     }
   }
 
-@app.post('/api/v1/integration')
+@app.post('/daily-standup-report')
 async def daily_standup_report(request: Request):
   try:
     data = await request.json()
@@ -96,10 +96,16 @@ async def daily_standup_report(request: Request):
     }
 
     async with httpx.AsyncClient() as client:
-      response = await client.post(return_url, json=payload)
+      response = await client.post(
+        return_url,
+        json=payload,
+        headers={
+          "Accept": "application/json",
+          "Content-Type": "application/json"
+        }
+      )
 
-    telex_response = await response.json()
-    return {"status": "Message sent", "telex_response": telex_response}
+    return {"status": "Message sent", "telex_response": response.json()}
 
   except Exception as e:
     return JSONResponse(
